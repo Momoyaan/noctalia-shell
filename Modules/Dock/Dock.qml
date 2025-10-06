@@ -17,7 +17,7 @@ Variants {
 
     required property ShellScreen modelData
     property real scaling: ScalingService.getScreenScale(modelData)
-    property bool barIsReady: BarService.isBarReady(modelData.name)
+    property bool barIsReady: modelData ? BarService.isBarReady(modelData.name) : false
 
     Connections {
       target: BarService
@@ -64,7 +64,9 @@ Variants {
     }
 
     // Shared properties between peek and dock windows
-    readonly property bool autoHide: Settings.data.dock.autoHide
+    readonly property string displayMode: Settings.data.dock.displayMode
+    readonly property bool autoHide: displayMode === "auto_hide"
+    readonly property bool exclusive: displayMode === "exclusive"
     readonly property int hideDelay: 500
     readonly property int showDelay: 100
     readonly property int hideAnimationDuration: Style.animationFast
@@ -74,7 +76,7 @@ Variants {
     readonly property int floatingMargin: Settings.data.dock.floatingRatio * Style.marginL * scaling
 
     // Bar detection and positioning properties
-    readonly property bool hasBar: modelData.name ? (Settings.data.bar.monitors.includes(modelData.name) || (Settings.data.bar.monitors.length === 0)) : false
+    readonly property bool hasBar: modelData && modelData.name ? (Settings.data.bar.monitors.includes(modelData.name) || (Settings.data.bar.monitors.length === 0)) : false
     readonly property bool barAtBottom: hasBar && Settings.data.bar.position === "bottom"
     readonly property int barHeight: Style.barHeight * scaling
 
@@ -250,7 +252,7 @@ Variants {
         color: Color.transparent
 
         WlrLayershell.namespace: "noctalia-dock-main"
-        WlrLayershell.exclusionMode: Settings.data.dock.exclusive ? ExclusionMode.Auto : ExclusionMode.Ignore
+        WlrLayershell.exclusionMode: exclusive ? ExclusionMode.Auto : ExclusionMode.Ignore
 
         // Size to fit the dock container exactly
         implicitWidth: dockContainerWrapper.width
@@ -480,7 +482,7 @@ Variants {
                         anyAppHovered = true
                         const appName = appButton.appTitle || appButton.appId || "Unknown"
                         const tooltipText = appName.length > 40 ? appName.substring(0, 37) + "..." : appName
-                        TooltipService.show(appButton, tooltipText, "top")
+                        TooltipService.show(Screen, appButton, tooltipText, "top")
                         if (autoHide) {
                           showTimer.stop()
                           hideTimer.stop()
