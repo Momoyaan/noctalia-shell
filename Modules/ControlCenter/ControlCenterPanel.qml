@@ -10,9 +10,28 @@ import qs.Widgets
 NPanel {
   id: root
 
-  preferredWidth: 460
-  preferredHeight: 688
+  preferredWidth: 400
+  preferredHeight: topHeight + midHeight + bottomHeight + audioHeight + Math.round(Style.marginL * 5)
   panelKeyboardFocus: true
+
+  readonly property int topHeight: {
+    const columns = (Settings.data.controlCenter.quickSettingsStyle === "compact") ? 4 : 3
+    const rowsCount = Math.ceil(Settings.data.controlCenter.widgets.quickSettings.length / columns)
+
+    var buttonHeight
+    if (Settings.data.controlCenter.quickSettingsStyle === "classic") {
+      buttonHeight = Style.baseWidgetSize
+    } else if (Settings.data.controlCenter.quickSettingsStyle === "compact") {
+      buttonHeight = Style.baseWidgetSize * 0.8 // Smaller for compact
+    } else {
+      buttonHeight = 56
+    }
+
+    return (rowsCount * buttonHeight) + 120
+  }
+  readonly property int midHeight: 220
+  readonly property int bottomHeight: 80
+  readonly property int audioHeight: 120
 
   // Positioning
   readonly property string controlCenterPosition: Settings.data.controlCenter.position
@@ -31,40 +50,33 @@ NPanel {
     // Layout content
     ColumnLayout {
       id: layout
-      x: content.cardSpacing
-      y: content.cardSpacing
-      width: parent.width - (2 * content.cardSpacing)
+      anchors.fill: parent
+      anchors.margins: content.cardSpacing
       spacing: content.cardSpacing
 
       // Top Card: profile + utilities
       TopCard {
+        id: topCard
         Layout.fillWidth: true
-        Layout.preferredHeight: Math.max(124 * scaling)
+        Layout.preferredHeight: topHeight * scaling
       }
 
-      // Weather
-      WeatherCard {
+      // Audio controls card
+      AudioCard {
         Layout.fillWidth: true
-        Layout.preferredHeight: Math.max(196 * scaling)
+        Layout.preferredHeight: audioHeight * scaling
       }
 
-      // Media + stats column
-      RowLayout {
+      // Media card
+      MediaCard {
         Layout.fillWidth: true
-        Layout.preferredHeight: Math.max(304 * scaling)
-        spacing: content.cardSpacing
+        Layout.preferredHeight: midHeight * scaling
+      }
 
-        // Media card
-        MediaCard {
-          Layout.fillWidth: true
-          Layout.fillHeight: true
-        }
-
-        // System monitors combined in one card
-        SystemMonitorCard {
-          Layout.preferredWidth: Style.baseWidgetSize * 2.625 * scaling
-          Layout.fillHeight: true
-        }
+      // System monitors combined in one card
+      SystemMonitorCard {
+        Layout.fillWidth: true
+        Layout.preferredHeight: bottomHeight * scaling
       }
     }
   }

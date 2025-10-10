@@ -220,7 +220,7 @@ ColumnLayout {
 
     // Color Schemes Grid
     GridLayout {
-      columns: Math.max(1, Math.floor((root.width + columnSpacing) / (222 * scaling + columnSpacing)))
+      columns: 3
       rowSpacing: Style.marginM * scaling
       columnSpacing: Style.marginM * scaling
       Layout.fillWidth: true
@@ -233,8 +233,8 @@ ColumnLayout {
 
           property string schemePath: modelData
 
+          Layout.fillWidth: true
           Layout.alignment: Qt.AlignHCenter
-          width: 222 * scaling
           height: 50 * scaling
           radius: Style.radiusS * scaling
           color: getSchemeColor(modelData, "mSurface")
@@ -405,6 +405,18 @@ ColumnLayout {
                      AppThemeService.generate()
                    }
       }
+
+      NCheckbox {
+        label: "KColorScheme"
+        description: I18n.tr("settings.color-scheme.templates.ui.kcolorscheme.description", {
+                               "filepath": "~/.local/share/color-schemes/noctalia.colors"
+                             })
+        checked: Settings.data.templates.kcolorscheme
+        onToggled: checked => {
+                     Settings.data.templates.kcolorscheme = checked
+                     AppThemeService.generate()
+                   }
+      }
     }
 
     // Terminal Emulators
@@ -494,22 +506,29 @@ ColumnLayout {
                    }
       }
 
-      NCheckbox {
-        label: "Vesktop"
-        description: ProgramCheckerService.vesktopAvailable ? I18n.tr("settings.color-scheme.templates.programs.vesktop.description", {
-                                                                        "filepath": "~/.config/vesktop/themes/noctalia.theme.css"
-                                                                      }) : I18n.tr("settings.color-scheme.templates.programs.vesktop.description-missing", {
-                                                                                     "app": "vesktop"
-                                                                                   })
-        checked: Settings.data.templates.vesktop
-        enabled: ProgramCheckerService.vesktopAvailable
-        opacity: ProgramCheckerService.vesktopAvailable ? 1.0 : 0.6
-        onToggled: checked => {
-                     if (ProgramCheckerService.vesktopAvailable) {
-                       Settings.data.templates.vesktop = checked
+      // Show individual checkboxes for each detected Discord client
+      Repeater {
+        model: ProgramCheckerService.availableDiscordClients
+        delegate: NCheckbox {
+          label: modelData.name.charAt(0).toUpperCase() + modelData.name.slice(1)
+          description: I18n.tr("settings.color-scheme.templates.programs.discord.description", {
+                                 "client": modelData.name.charAt(0).toUpperCase() + modelData.name.slice(1),
+                                 "filepath": modelData.themePath
+                               })
+          checked: Settings.data.templates["discord_" + modelData.name] || false
+          onToggled: checked => {
+                       Settings.data.templates["discord_" + modelData.name] = checked
                        AppThemeService.generate()
                      }
-                   }
+        }
+      }
+
+      // Show message if no Discord clients detected
+      NText {
+        visible: ProgramCheckerService.availableDiscordClients.length === 0
+        text: I18n.tr("settings.color-scheme.templates.programs.discord.description-missing")
+        color: Color.mOnSurfaceVariant
+        pointSize: Style.fontSizeS * scaling
       }
 
       NCheckbox {

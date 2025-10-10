@@ -9,15 +9,10 @@ import qs.Widgets
 NBox {
   id: root
 
-  ColumnLayout {
+  RowLayout {
     id: content
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: parent.top
-    anchors.leftMargin: Style.marginS * scaling
-    anchors.rightMargin: Style.marginS * scaling
-    anchors.topMargin: Style.marginXS * scaling
-    anchors.bottomMargin: Style.marginM * scaling
+    anchors.fill: parent
+    anchors.margins: Style.marginXS * scaling
     spacing: Style.marginS * scaling
 
     NCircleStat {
@@ -25,8 +20,8 @@ NBox {
       icon: "cpu-usage"
       flat: true
       contentScale: 0.8
-      width: 72 * scaling
-      height: 68 * scaling
+      Layout.fillWidth: true
+      Layout.fillHeight: true
     }
     NCircleStat {
       value: SystemStatService.cpuTemp
@@ -34,24 +29,24 @@ NBox {
       icon: "cpu-temperature"
       flat: true
       contentScale: 0.8
-      width: 72 * scaling
-      height: 68 * scaling
+      Layout.fillWidth: true
+      Layout.fillHeight: true
     }
     NCircleStat {
       value: SystemStatService.memPercent
       icon: "memory"
       flat: true
       contentScale: 0.8
-      width: 72 * scaling
-      height: 68 * scaling
+      Layout.fillWidth: true
+      Layout.fillHeight: true
     }
     NCircleStat {
       value: SystemStatService.diskPercent
       icon: "storage"
       flat: true
       contentScale: 0.8
-      width: 72 * scaling
-      height: 68 * scaling
+      Layout.fillWidth: true
+      Layout.fillHeight: true
     }
   }
 }

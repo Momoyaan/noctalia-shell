@@ -36,8 +36,8 @@ Rectangle {
   }
 
   // Always visible when there are toplevels
-  implicitWidth: isVerticalBar ? Math.round(Style.capsuleHeight * scaling) : taskbarLayout.implicitWidth + Style.marginM * scaling * 2
-  implicitHeight: isVerticalBar ? taskbarLayout.implicitHeight + Style.marginM * scaling * 2 : Math.round(Style.capsuleHeight * scaling)
+  implicitWidth: isVerticalBar ? Math.round(Style.capsuleHeight * scaling) : Math.round(taskbarLayout.implicitWidth + Style.marginM * scaling * 2)
+  implicitHeight: isVerticalBar ? Math.round(taskbarLayout.implicitHeight + Style.marginM * scaling * 2) : Math.round(Style.capsuleHeight * scaling)
   radius: Math.round(Style.radiusM * scaling)
   color: Settings.data.bar.showCapsule ? Color.mSurfaceVariant : Color.transparent
 
@@ -105,13 +105,13 @@ Rectangle {
 
             if (mouse.button === Qt.LeftButton) {
               try {
-                CompositorService.focusWindow(taskbarItem.modelData.id)
+                CompositorService.focusWindow(taskbarItem.modelData)
               } catch (error) {
                 Logger.error("Taskbar", "Failed to activate toplevel: " + error)
               }
             } else if (mouse.button === Qt.RightButton) {
               try {
-                CompositorService.closeWindow(taskbarItem.modelData.id)
+                CompositorService.closeWindow(taskbarItem.modelData)
               } catch (error) {
                 Logger.error("Taskbar", "Failed to close toplevel: " + error)
               }
